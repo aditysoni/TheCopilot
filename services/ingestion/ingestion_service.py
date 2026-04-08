@@ -63,7 +63,6 @@ class IngestionService:
                 chunk_text=chunk_text,
                 token_count=len(chunk_text.split()),
                 embedding_json=embedding,
-                embedding=embedding,
             )
             db.add(chunk)
 
@@ -143,7 +142,8 @@ class IngestionService:
                 )
                 ingested += 1
             except Exception as exc:
-                logger.warning("Failed to ingest JSONL record: %s", exc)
+                logger.error("Failed to ingest JSONL record: %s | record: %s", exc, line[:200])
+                db.rollback()
                 failed += 1
 
         return ingested, failed
