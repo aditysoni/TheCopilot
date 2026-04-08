@@ -1,6 +1,6 @@
 from apps.api.app.core.config import settings
-from packages.services.llm.providers.gemini_provider import GeminiProvider
-from packages.services.llm.providers.llama_provider import LlamaProvider
+from services.llm.providers.gemini_provider import GeminiProvider
+from services.llm.providers.llama_provider import LlamaProvider
 
 
 def get_llm_provider():

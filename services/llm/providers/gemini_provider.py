@@ -3,7 +3,7 @@ from typing import List
 import google.generativeai as genai
 
 from apps.api.app.core.config import settings
-from packages.services.llm.base import BaseLLMProvider
+from services.llm.base import BaseLLMProvider
 from packages.types.schemas import SourceItem, AnalyticsResult
 from packages.utils.logger import get_logger
 
