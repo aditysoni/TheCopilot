@@ -98,6 +98,56 @@ class IngestionService:
             metadata=metadata,
         )
 
+    def ingest_jsonl(
+        self,
+        db: Session,
+        *,
+        jsonl_text: str,
+        author: str | None = None,
+        trust_level: str = "official",
+    ) -> tuple[int, int]:
+        import json
+
+        lines = [l.strip() for l in jsonl_text.splitlines() if l.strip()]
+        ingested = 0
+        failed = 0
+
+        for line in lines:
+            try:
+                record = json.loads(line)
+                title = (
+                    record.get("title")
+                    or record.get("name")
+                    or record.get("id", "Untitled")
+                )
+                text = (
+                    record.get("text")
+                    or record.get("content")
+                    or record.get("body")
+                    or record.get("answer")
+                    or ""
+                )
+                if record.get("question") and record.get("answer"):
+                    text = f"Q: {record['question']}\nA: {record['answer']}"
+                if not text:
+                    failed += 1
+                    continue
+                self.ingest_text_source(
+                    db=db,
+                    title=str(title),
+                    text=str(text),
+                    source_type="doc",
+                    author=author,
+                    trust_level=trust_level,
+                    metadata={"source": "jsonl"},
+                )
+                ingested += 1
+            except Exception as exc:
+                logger.warning("Failed to ingest JSONL record: %s", exc)
+                failed += 1
+
+        return ingested, failed
+
     def ingest_file(
         self,
         db: Session,

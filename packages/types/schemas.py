@@ -83,6 +83,14 @@ class IngestFileResponse(BaseModel):
     message: str
 
 
+class IngestJsonlResponse(BaseModel):
+    filename: str
+    total_records: int
+    ingested: int
+    failed: int
+    message: str
+
+
 class SourceListItem(BaseModel):
     id: str
     source_type: str

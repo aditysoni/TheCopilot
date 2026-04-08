@@ -12,6 +12,7 @@ from packages.types.schemas import (
     IngestTextRequest,
     IngestUrlRequest,
     IngestFileResponse,
+    IngestJsonlResponse,
 )
 from services.ingestion.ingestion_service import IngestionService
 
@@ -105,6 +106,40 @@ def ingest_file(
             chunk_count=chunk_count,
             extracted_chars=extracted_chars,
             message="File ingested successfully",
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.post("/ingest/jsonl", response_model=IngestJsonlResponse)
+def ingest_jsonl(
+    db: Session = Depends(get_db),
+    file: UploadFile = File(...),
+    author: str | None = Form(default=None),
+    trust_level: str = Form(default="official"),
+):
+    try:
+        if not file.filename or not file.filename.endswith(".jsonl"):
+            raise HTTPException(status_code=400, detail="Only .jsonl files are supported")
+
+        content = file.file.read().decode("utf-8")
+        total = len([l for l in content.splitlines() if l.strip()])
+
+        ingested, failed = ingestion_service.ingest_jsonl(
+            db=db,
+            jsonl_text=content,
+            author=author,
+            trust_level=trust_level,
+        )
+
+        return IngestJsonlResponse(
+            filename=file.filename,
+            total_records=total,
+            ingested=ingested,
+            failed=failed,
+            message=f"Ingested {ingested}/{total} records",
         )
     except HTTPException:
         raise
