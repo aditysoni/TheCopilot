@@ -55,7 +55,7 @@ class RetrievalService:
         for chunk in chunks:
             chunk_embedding = chunk.embedding_json or []
             base_score = cosine_similarity(query_embedding, chunk_embedding)
-            weighted_score = base_score * source_weight(chunk.source.source_type)
+            weighted_score = min(base_score * source_weight(chunk.source.source_type), 1.0)
 
             scored.append(
                 {
