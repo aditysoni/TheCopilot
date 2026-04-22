@@ -13,17 +13,19 @@ class EmbeddingService:
         self.has_gemini = bool(settings.GEMINI_API_KEY)
         if self.has_gemini:
             genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.ollama_embed_url = f"{settings.LLAMA_BASE_URL.rstrip('/')}/api/embeddings"
+        self.ollama_embed_url = f"{settings.LLAMA_BASE_URL.rstrip('/')}/api/embed"
 
     def _ollama_embedding(self, text: str) -> List[float]:
         try:
             response = requests.post(
                 self.ollama_embed_url,
-                json={"model": "nomic-embed-text", "prompt": text},
+                json={"model": "nomic-embed-text", "input": text},
                 timeout=30,
             )
             response.raise_for_status()
-            return response.json().get("embedding", [])
+            data = response.json()
+            embeddings = data.get("embeddings", [])
+            return embeddings[0] if embeddings else []
         except Exception as exc:
             logger.error("Ollama embedding failed: %s", exc)
             return []

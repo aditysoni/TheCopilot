@@ -12,7 +12,10 @@ env/
 .env
 
 # Storage
+storage/docs/
 storage/uploads/
+
 
 # OS
 .DS_Store
+
