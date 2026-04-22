@@ -62,6 +62,10 @@ Citation rules:
 - Do not invent citations.
 - If the answer is "I don’t have enough grounded information to answer that yet.", do not add citations.
 
+Style rules:
+- Do NOT start your answer with phrases like "As per the provided resources", "Based on the provided context", "According to the sources", or any similar preamble.
+- Start directly with the answer.
+
 User question:
 {user_message}
 
